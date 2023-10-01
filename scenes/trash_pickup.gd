@@ -10,3 +10,4 @@ func handleTimedEvent():
 	var check = GameManager.check_position(global_position)
 	if check != null && check is Crate:
 		check.destroy()
+	self.queue_free()

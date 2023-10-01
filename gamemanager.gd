@@ -5,6 +5,7 @@ var timedEvents = { }
 var curTileMap : TileMap
 var sendButton : Marker2D
 var clearButton : Marker2D
+var refuelButton : Marker2D
 var numBlankCrates : int
 var player : Node2D
 
@@ -12,7 +13,11 @@ const GRID_SIZE = 100.0
 
 signal sendPressed
 signal clearPressed
+signal refuelPressed
 signal playerMoved
+signal refuelEvent
+signal cratesDelivered
+signal gameOver
 
 func add_timed_event(object: TimedEvent):
 	timedEvents[convert_position(object.global_position)] = object
@@ -31,6 +36,10 @@ func add_clear_button(object: Marker2D):
 	clearButton = object
 	add_object(object)
 
+func add_refuel_button(object: Marker2D):
+	refuelButton = object
+	add_object(object)
+
 func is_button(position: Vector2):
 	var check = check_position(position)
 	if check == sendButton:
@@ -38,6 +47,9 @@ func is_button(position: Vector2):
 		return true
 	elif check == clearButton:
 		clearPressed.emit()
+		return true
+	elif check == refuelButton:
+		refuelPressed.emit()
 		return true
 	return false
 
@@ -63,3 +75,6 @@ func convert_position(position: Vector2) -> Vector2:
 func _process(delta):
 	if Input.is_physical_key_pressed(KEY_F5):
 		get_tree().quit()
+		
+func wiggle(t:float) -> float:
+	return sin(-13.0 * PI/2.0 * (t+1)) * pow(2, -10 * t) + 1

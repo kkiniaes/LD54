@@ -9,6 +9,7 @@ var isMoving = false
 var areForksExtended = false
 var carrying = null
 var holdDelay = 0.1
+var isGameOver = false
 
 const moveSpeed = 7
 const forksMinScale = 0.1
@@ -18,8 +19,14 @@ func _ready():
 	forks.scale.y = forksMinScale
 	camera.offset = Vector2.DOWN * cameraOffsetAmount
 	GameManager.player = self
+	GameManager.gameOver.connect(handle_gameover)
+
+func handle_gameover():
+	isGameOver = true
 
 func _process(delta):
+	if isGameOver:
+		return
 	if holdDelay > 0:
 		holdDelay -= delta
 	else:
@@ -74,7 +81,7 @@ func move_player(direction: Vector2):
 		nextPos = position
 		while (timer < 1):
 			timer += get_process_delta_time() * moveSpeed / 2.0
-			position = startPos.lerp(nextPos, wiggle(timer))
+			position = startPos.lerp(nextPos, GameManager.wiggle(timer))
 			await get_tree().process_frame
 	position = nextPos
 	isMoving = false
@@ -105,7 +112,7 @@ func rot_player(angle):
 		var endAngle = rotation
 		while (timer < 1):
 			timer += get_process_delta_time() * moveSpeed
-			rotation = lerp_angle(startAngle, endAngle, wiggle(timer))
+			rotation = lerp_angle(startAngle, endAngle, GameManager.wiggle(timer))
 			await get_tree().process_frame
 		rotation = endAngle
 	isMoving = false
@@ -209,9 +216,6 @@ func can_fork_rotate(rotation) -> bool:
 			extraPos = pos + Vector2.RIGHT * GameManager.GRID_SIZE
 	
 	return GameManager.check_position(pos) == null && GameManager.check_position(extraPos) == null
-	
-func wiggle(t:float) -> float:
-	return sin(-13.0 * PI/2.0 * (t+1)) * pow(2, -10 * t) + 1
 	
 	
 	

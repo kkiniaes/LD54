@@ -18,7 +18,6 @@ func handlePlayerMoved():
 		event.emit()
 		GameManager.playerMoved.disconnect(handlePlayerMoved)
 		GameManager.remove_timed_event(global_position)
-		self.queue_free()
 	else:
 		$Label.text = str(movesTillEvent)
 	

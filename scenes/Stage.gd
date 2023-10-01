@@ -2,8 +2,10 @@ extends Node
 
 @export var recieveSpots: Array[Marker2D]
 @export var deliverySpots: Array[Sprite2D]
+@export var refuelSpots : Array[Sprite2D]
 @export var sendButton : Marker2D
 @export var clearButton : Marker2D
+@export var refuelButton : Marker2D
 @export var deliveryDoors : Node2D
 @export var recievingDoors : Node2D
 
@@ -11,8 +13,9 @@ var doorsAnimating = false
 
 const crateScene : PackedScene = preload("res://scenes/crate.tscn")
 const trashPickupScene : PackedScene = preload("res://scenes/trash_pickup.tscn")
+const paintEventScene : PackedScene = preload("res://scenes/paint_event.tscn")
 
-const colors = [Color.RED, Color.BLUE, Color.GREEN]
+const colors = [Color.RED, Color.DEEP_SKY_BLUE, Color.GREEN]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -21,6 +24,10 @@ func _ready():
 	GameManager.sendPressed.connect(handle_send_pressed)
 	GameManager.add_clear_button(clearButton)
 	GameManager.clearPressed.connect(handle_clear_pressed)
+	GameManager.add_refuel_button(refuelButton)
+	GameManager.refuelPressed.connect(handle_refuel_pressed)
+	for spot in refuelSpots:
+		spot.modulate = colors[randi() % colors.size()]
 	for i in 10:
 		var randX = randi_range(-6,6)
 		var randY = randi_range(-3,3)
@@ -31,6 +38,21 @@ func _ready():
 					spawn_random_crate(position, 0)
 				else:
 					spawn_random_crate(position, 1)
+
+func handle_refuel_pressed():
+	var allGood = true
+	for spot in refuelSpots:
+		var check = GameManager.check_position(spot.global_position)
+		if !(check is Crate):
+			allGood = false
+		elif !check.modulate.is_equal_approx(spot.modulate):
+			allGood = false
+	if allGood:
+		GameManager.refuelEvent.emit()
+		for spot in refuelSpots:
+			var check = GameManager.check_position(spot.global_position)
+			check.destroy()
+			spot.modulate = colors[randi() % colors.size()]
 
 func handle_send_pressed():
 	if doorsAnimating:
@@ -49,11 +71,14 @@ func handle_send_pressed():
 			allGood = false
 	if allGood:
 		await animateDoors(deliveryDoors, false)
+		var numDelivered = 0
 		for sprite in deliverySpots:
 			if sprite.visible:
+				numDelivered += 1
 				var check = GameManager.check_position(sprite.global_position)
 				check.destroy()
 				sprite.visible = false
+		GameManager.cratesDelivered.emit(numDelivered)
 		new_delivery_order()
 		await animateDoors(deliveryDoors, true)
 		spawn_trash_pickups()
@@ -67,9 +92,20 @@ func spawn_trash_pickups():
 		var position = Vector2(randX,randY)*100
 		if !GameManager.check_timed_event(position):
 			var newTrash = trashPickupScene.instantiate()
-			get_tree().root.add_child(newTrash)
+			add_child(newTrash)
 			newTrash.global_position = position
-			newTrash.initialize(51)
+			newTrash.initialize(101)
+
+func spawn_paint_events():
+	for c in colors:
+		var randX = randi_range(-6,6)
+		var randY = randi_range(-3,3)
+		var position = Vector2(randX,randY)*100
+		if !GameManager.check_timed_event(position):
+			var newPaintEvent = paintEventScene.instantiate()
+			add_child(newPaintEvent)
+			newPaintEvent.global_position = position
+			newPaintEvent.initialize(101, c)
 
 func handle_clear_pressed():
 	if doorsAnimating:
@@ -84,7 +120,8 @@ func handle_clear_pressed():
 	if allGood:
 		await animateDoors(recievingDoors, false)
 		recieve_crates()
-		animateDoors(recievingDoors, true)
+		await animateDoors(recievingDoors, true)
+		spawn_paint_events()
 
 func animateDoors(doorRoot, open):
 	doorsAnimating = true
@@ -112,11 +149,11 @@ func animateDoors(doorRoot, open):
 
 func recieve_crates():
 	for spot in recieveSpots:
-		spawn_random_crate(spot.global_position, 0.4)
+		spawn_random_crate(spot.global_position, 0.6)
 
 func spawn_random_crate(global_position, trashChance):
 	var spawnedCrate = crateScene.instantiate()
-	get_tree().root.add_child(spawnedCrate)
+	add_child(spawnedCrate)
 	spawnedCrate.global_position = global_position
 	var color = null
 	if randf() > trashChance:
@@ -127,9 +164,9 @@ func new_delivery_order():
 	var pickedDeliverySpots = []
 	var randomDeliverCount = 3 + randi() % 4
 	for i in randomDeliverCount:
-		var randDeliver = randi() % recieveSpots.size()
+		var randDeliver = randi() % deliverySpots.size()
 		while randDeliver in pickedDeliverySpots:
-			randDeliver = randi() % recieveSpots.size()
+			randDeliver = randi() % deliverySpots.size()
 		pickedDeliverySpots.append(randDeliver)
 		deliverySpots[randDeliver].modulate = colors[randi() % colors.size()]
 	for i in deliverySpots.size():

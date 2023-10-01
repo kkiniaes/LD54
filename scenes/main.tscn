@@ -1,11 +1,213 @@
-[gd_scene load_steps=4 format=3 uid="uid://ciihud667hxom"]
+[gd_scene load_steps=13 format=3 uid="uid://ciihud667hxom"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_kc52w"]
 [ext_resource type="PackedScene" uid="uid://bqnuou00dp37b" path="res://scenes/player.tscn" id="1_lub1h"]
 [ext_resource type="PackedScene" uid="uid://daguwie5k5nyj" path="res://scenes/stages/stage_1.tscn" id="2_brq4w"]
+[ext_resource type="Script" path="res://scenes/fuel_handler.gd" id="4_8yj54"]
+[ext_resource type="Texture2D" uid="uid://db6hj1etpxeot" path="res://sprites/gas-can.png" id="4_rbem1"]
+[ext_resource type="Texture2D" uid="uid://3ua5br7hi6cg" path="res://sprites/crate.png" id="6_kj36y"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3plla"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1k4cw"]
+bg_color = Color(1, 1, 1, 1)
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kflmv"]
+bg_color = Color(0.12549, 0.207843, 0.298039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hekc6"]
+bg_color = Color(0.294118, 0.427451, 0.882353, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_202fb"]
+bg_color = Color(0.125, 0.207031, 0.296875, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uft1j"]
+bg_color = Color(0.294118, 0.427451, 0.882353, 1)
 
 [node name="main" type="Node2D"]
 script = ExtResource("1_kc52w")
 stages = Array[PackedScene]([ExtResource("2_brq4w")])
+metadata/_edit_vertical_guides_ = []
 
 [node name="Player" parent="." instance=ExtResource("1_lub1h")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 75.0
+offset_top = -120.0
+offset_right = 535.0
+offset_bottom = -70.0
+grow_vertical = 0
+pivot_offset = Vector2(230, 25)
+theme_override_styles/panel = SubResource("StyleBoxFlat_3plla")
+script = ExtResource("4_8yj54")
+
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+theme_override_font_sizes/font_size = 25
+max_value = 1000.0
+value = 1000.0
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Panel"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_right = 49.435
+texture = ExtResource("4_rbem1")
+
+[node name="ScoreBG" type="TextureRect" parent="CanvasLayer"]
+unique_name_in_owner = true
+self_modulate = Color(0.454902, 0.454902, 0.454902, 1)
+texture_filter = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 76.0
+offset_top = -234.0
+offset_right = 176.0
+offset_bottom = -134.0
+grow_vertical = 0
+pivot_offset = Vector2(50, 50)
+texture = ExtResource("6_kj36y")
+expand_mode = 2
+metadata/_edit_group_ = true
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/ScoreBG"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 15
+theme_override_font_sizes/font_size = 50
+text = "10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameOverPanel" type="Panel" parent="CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(0.443137, 0, 0, 0.796078)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1k4cw")
+
+[node name="GameOverLabel" type="Label" parent="CanvasLayer/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -272.5
+offset_top = 100.0
+offset_right = 272.5
+offset_bottom = 240.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 100
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DetailLabels" type="Label" parent="CanvasLayer/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -278.0
+offset_top = -72.0
+offset_right = 137.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 50
+text = "Crates Delivered:
+Refuels:"
+vertical_alignment = 1
+
+[node name="Details" type="Label" parent="CanvasLayer/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -127.0
+offset_top = -72.0
+offset_right = 288.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 50
+text = "10
+5"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MainMenuButton" type="Button" parent="CanvasLayer/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 597.0
+offset_top = -253.0
+offset_right = 970.0
+offset_bottom = -176.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_kflmv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hekc6")
+text = "Main Menu"
+
+[node name="RetryButton" type="Button" parent="CanvasLayer/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -910.0
+offset_top = -253.0
+offset_right = -565.0
+offset_bottom = -176.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_202fb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_uft1j")
+text = "Retry"
+
+[connection signal="pressed" from="CanvasLayer/GameOverPanel/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/GameOverPanel/RetryButton" to="." method="_on_retry_button_pressed"]
