@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3 uid="uid://ciihud667hxom"]
+
+[ext_resource type="Script" path="res://scenes/main.gd" id="1_kc52w"]
+[ext_resource type="PackedScene" uid="uid://bqnuou00dp37b" path="res://scenes/player.tscn" id="1_lub1h"]
+[ext_resource type="PackedScene" uid="uid://daguwie5k5nyj" path="res://scenes/stages/stage_1.tscn" id="2_brq4w"]
+
+[node name="main" type="Node2D"]
+script = ExtResource("1_kc52w")
+stages = Array[PackedScene]([ExtResource("2_brq4w")])
+
+[node name="Player" parent="." instance=ExtResource("1_lub1h")]
