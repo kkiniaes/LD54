@@ -9,9 +9,15 @@ extends Node
 @export var deliveryDoors : Node2D
 @export var recievingDoors : Node2D
 
+@onready var buttonSound: AudioStream = preload("res://sounds/button_press.wav")
+@onready var errorSound: AudioStream = preload("res://sounds/error.wav")
+@onready var soundPlayer : AudioStreamPlayer = $AudioStreamPlayer
+
 var doorsAnimating = false
 
 const crateScene : PackedScene = preload("res://scenes/crate.tscn")
+const heavyCrateScene : PackedScene = preload("res://scenes/heavy_crate.tscn")
+const rainbowCrateScene : PackedScene = preload("res://scenes/rainbow_crate.tscn")
 const trashPickupScene : PackedScene = preload("res://scenes/trash_pickup.tscn")
 const paintEventScene : PackedScene = preload("res://scenes/paint_event.tscn")
 
@@ -53,6 +59,9 @@ func handle_refuel_pressed():
 			var check = GameManager.check_position(spot.global_position)
 			check.destroy()
 			spot.modulate = colors[randi() % colors.size()]
+	else:
+		soundPlayer.stream = errorSound
+		soundPlayer.play()
 
 func handle_send_pressed():
 	if doorsAnimating:
@@ -64,12 +73,14 @@ func handle_send_pressed():
 			if !(check is Crate):
 				allGood = false
 				break
-			elif !check.modulate.is_equal_approx(sprite.modulate):
+			elif !check.modulate.is_equal_approx(sprite.modulate) && !(check is RainbowCrate):
 				allGood = false
 				break
 		elif check != null:
 			allGood = false
 	if allGood:
+		soundPlayer.stream = buttonSound
+		soundPlayer.play()
 		await animateDoors(deliveryDoors, false)
 		var numDelivered = 0
 		for sprite in deliverySpots:
@@ -82,6 +93,9 @@ func handle_send_pressed():
 		new_delivery_order()
 		await animateDoors(deliveryDoors, true)
 		spawn_trash_pickups()
+	else:
+		soundPlayer.stream = errorSound
+		soundPlayer.play()
 
 func spawn_trash_pickups():
 	var numTrashPickups = GameManager.numBlankCrates / 2 + randi_range(-4,0)
@@ -118,10 +132,15 @@ func handle_clear_pressed():
 			break
 	
 	if allGood:
+		soundPlayer.stream = buttonSound
+		soundPlayer.play()
 		await animateDoors(recievingDoors, false)
 		recieve_crates()
 		await animateDoors(recievingDoors, true)
 		spawn_paint_events()
+	else:
+		soundPlayer.stream = errorSound
+		soundPlayer.play()
 
 func animateDoors(doorRoot, open):
 	doorsAnimating = true
@@ -148,8 +167,25 @@ func animateDoors(doorRoot, open):
 	doorsAnimating = false
 
 func recieve_crates():
-	for spot in recieveSpots:
-		spawn_random_crate(spot.global_position, 0.6)
+	var spawnHeavyCrate = randf() < 0.25
+	var randHeavySpot = randi() % recieveSpots.size()
+	if !spawnHeavyCrate:
+		randHeavySpot = -1
+	var spawnRainbowCrate = randf() < 0.25
+	var randRainbowSpot = randi() % recieveSpots.size()
+	for i in recieveSpots.size():
+		if spawnHeavyCrate && randHeavySpot == i:
+			var spawnedHeavy = heavyCrateScene.instantiate()
+			add_child(spawnedHeavy)
+			spawnedHeavy.global_position = recieveSpots[i].global_position
+			spawnedHeavy.initialize()
+		elif spawnRainbowCrate && randRainbowSpot != randHeavySpot && randRainbowSpot == i:
+			var spawnedRainbow = rainbowCrateScene.instantiate()
+			add_child(spawnedRainbow)
+			spawnedRainbow.global_position = recieveSpots[i].global_position
+			spawnedRainbow.initialize(Color.MAGENTA)
+		else:
+			spawn_random_crate(recieveSpots[i].global_position, 0.6)
 
 func spawn_random_crate(global_position, trashChance):
 	var spawnedCrate = crateScene.instantiate()

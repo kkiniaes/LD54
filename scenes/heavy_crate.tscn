@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://xkjja4r8cy0d"]
+
+[ext_resource type="Texture2D" uid="uid://bc1bgcdyqbacs" path="res://sprites/heavy-crate.png" id="1_1dooy"]
+[ext_resource type="Script" path="res://scenes/heavy_crate.gd" id="2_ta5t0"]
+
+[node name="HeavyCrate" type="Sprite2D"]
+scale = Vector2(0.68, 0.68)
+texture = ExtResource("1_1dooy")
+script = ExtResource("2_ta5t0")

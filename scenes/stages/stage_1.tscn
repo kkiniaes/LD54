@@ -231,3 +231,5 @@ texture = ExtResource("7_gy0c8")
 offset = Vector2(-50, 0)
 region_enabled = true
 region_rect = Rect2(128, 0, 100, 256)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

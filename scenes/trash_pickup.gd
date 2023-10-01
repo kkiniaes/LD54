@@ -8,6 +8,6 @@ func initialize(movesTillEvent: int):
 
 func handleTimedEvent():
 	var check = GameManager.check_position(global_position)
-	if check != null && check is Crate:
+	if check != null && (check is Crate || check is HeavyCrate):
 		check.destroy()
 	self.queue_free()

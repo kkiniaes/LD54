@@ -1,7 +1,13 @@
 extends Sprite2D
 
+@export var moveSound: AudioStream
+@export var hitSound: AudioStream
+@export var grabSound: AudioStream
+@export var dropSound: AudioStream
+
 @onready var forks = $"forks"
 @onready var camera: Camera2D = $Camera2D
+@onready var audioPlayer: AudioStreamPlayer = $AudioStreamPlayer
 
 enum { LEFT, RIGHT, UP, DOWN }
 var facing = DOWN
@@ -10,6 +16,8 @@ var areForksExtended = false
 var carrying = null
 var holdDelay = 0.1
 var isGameOver = false
+var consecutiveMoves = 0
+var prevMove = Vector2.DOWN
 
 const moveSpeed = 7
 const forksMinScale = 0.1
@@ -68,17 +76,34 @@ func move_player(direction: Vector2):
 	var timer = 0.0
 	var nextPos = position + direction * GameManager.GRID_SIZE
 	var playerCanMove = GameManager.check_position(nextPos) == null
-	var carryCanMove = (carrying == null || GameManager.check_position(get_forks_position() + direction*GameManager.GRID_SIZE) == null)
+	var carryCanMove = carrying == null
+	if !carryCanMove && carrying is Crate:
+		carryCanMove = GameManager.check_position(get_forks_position() + direction*GameManager.GRID_SIZE) == null
 	if playerCanMove && carryCanMove:
+		if prevMove == direction:
+			consecutiveMoves += 1
+		else:
+			consecutiveMoves = 0
+		prevMove = direction
+		GameManager.playerMoved.emit()
+		audioPlayer.stream = moveSound
+		audioPlayer.play()
+		audioPlayer.volume_db = clampf(lerpf(-5,5,consecutiveMoves/5.0),-5,5)
+		audioPlayer.pitch_scale = clampf(lerpf(0.8,1.2,consecutiveMoves/5.0), 0.8,1.2)
 		var startPos = position
 		while (timer < 1):
 			timer += get_process_delta_time() * moveSpeed
 			position = startPos.lerp(nextPos, timer)
 			await get_tree().process_frame
-		GameManager.playerMoved.emit()
+			
 	else:
+		consecutiveMoves = 0
 		var startPos = position + direction * GameManager.GRID_SIZE / 4.0
 		nextPos = position
+		audioPlayer.stream = hitSound
+		audioPlayer.volume_db = 0
+		audioPlayer.pitch_scale = 1
+		audioPlayer.play()
 		while (timer < 1):
 			timer += get_process_delta_time() * moveSpeed / 2.0
 			position = startPos.lerp(nextPos, GameManager.wiggle(timer))
@@ -90,6 +115,7 @@ func rot_player(angle):
 	if isMoving:
 		return
 	isMoving = true
+	consecutiveMoves = 0
 	var timer = 0.0
 	if can_fork_rotate(angle):
 		var startAngle = rotation
@@ -110,6 +136,10 @@ func rot_player(angle):
 	else:
 		var startAngle = lerp_angle(rotation, deg_to_rad(angle), 0.5)
 		var endAngle = rotation
+		audioPlayer.stream = hitSound
+		audioPlayer.volume_db = 0
+		audioPlayer.pitch_scale = 1
+		audioPlayer.play()
 		while (timer < 1):
 			timer += get_process_delta_time() * moveSpeed
 			rotation = lerp_angle(startAngle, endAngle, GameManager.wiggle(timer))
@@ -123,6 +153,7 @@ func toggleForks(extend):
 	if GameManager.is_button(get_forks_position()):
 		return
 	isMoving = true
+	consecutiveMoves = 0
 	var timer = 0.0
 	while timer < 1:
 		timer += get_process_delta_time() * moveSpeed
@@ -135,13 +166,21 @@ func toggleForks(extend):
 	isMoving = false
 	if extend:
 		var check = GameManager.check_position(get_forks_position())
-		if check is Crate:
+		if check is Crate || check is HeavyCrate:
+			audioPlayer.stream = grabSound
+			audioPlayer.volume_db = 0
+			audioPlayer.pitch_scale = 1
+			audioPlayer.play()
 			carrying = check
 			check.reparent(self)
 			GameManager.remove_object(get_forks_position())
 		else:
 			toggleForks(false)
 	elif carrying != null:
+		audioPlayer.stream = dropSound
+		audioPlayer.volume_db = 0
+		audioPlayer.pitch_scale = 1
+		audioPlayer.play()
 		carrying.reparent(get_parent())
 		GameManager.add_object(carrying)
 		carrying = null

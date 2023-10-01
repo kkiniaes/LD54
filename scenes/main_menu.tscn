@@ -76,9 +76,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -358.0
-offset_top = -154.0
+offset_top = -172.0
 offset_right = 358.0
-offset_bottom = 374.0
+offset_bottom = 428.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
@@ -113,6 +113,14 @@ layout_mode = 2
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "All code and assets were created within the time limit of Ludum Dare 54 Compo 48hr solo competition. This is my first real Godot project, thanks for checking it out!"
+autowrap_mode = 2
+
+[node name="Label3" type="Label" parent="MainButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Solo Creation by
+Kartik Kini (@kiniperson)"
+horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="HelpMenu" type="RichTextLabel" parent="."]

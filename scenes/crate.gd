@@ -2,7 +2,6 @@ class_name Crate extends Sprite2D
 
 var isBlankCrate = false
 
-# Called when the node enters the scene tree for the first time.
 func initialize(color):
 	GameManager.add_object(self)
 	if color == null:
