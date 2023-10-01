@@ -25,7 +25,7 @@ func handle_gameover():
 	isGameOver = true
 
 func _process(delta):
-	if isGameOver:
+	if isGameOver || GameManager.isPaused:
 		return
 	if holdDelay > 0:
 		holdDelay -= delta

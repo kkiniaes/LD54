@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://ciihud667hxom"]
+[gd_scene load_steps=15 format=3 uid="uid://ciihud667hxom"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_kc52w"]
 [ext_resource type="PackedScene" uid="uid://bqnuou00dp37b" path="res://scenes/player.tscn" id="1_lub1h"]
@@ -31,6 +31,12 @@ bg_color = Color(0.125, 0.207031, 0.296875, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uft1j"]
 bg_color = Color(0.294118, 0.427451, 0.882353, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fgv41"]
+bg_color = Color(0, 0, 0, 0.929412)
+
+[sub_resource type="Theme" id="Theme_vvmwg"]
+default_font_size = 29
 
 [node name="main" type="Node2D"]
 script = ExtResource("1_kc52w")
@@ -209,5 +215,122 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_202fb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_uft1j")
 text = "Retry"
 
+[node name="Pause" type="Panel" parent="CanvasLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fgv41")
+
+[node name="PauseLabel" type="Label" parent="CanvasLayer/Pause"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -287.0
+offset_top = 100.0
+offset_right = 287.0
+offset_bottom = 240.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 100
+text = "PAUSE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MainButtons" type="VBoxContainer" parent="CanvasLayer/Pause"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -358.0
+offset_top = -194.0
+offset_right = 358.0
+offset_bottom = 334.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Continue" type="Button" parent="CanvasLayer/Pause/MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Continue"
+
+[node name="MainMenu" type="Button" parent="CanvasLayer/Pause/MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Main Menu"
+
+[node name="Help" type="Button" parent="CanvasLayer/Pause/MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Help"
+
+[node name="Quit" type="Button" parent="CanvasLayer/Pause/MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Quit"
+
+[node name="Space" type="Control" parent="CanvasLayer/Pause/MainButtons"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="HelpMenu" type="RichTextLabel" parent="CanvasLayer/Pause"]
+visible = false
+layout_mode = 2
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -685.0
+offset_top = -258.0
+offset_right = 685.0
+offset_bottom = 432.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_vvmwg")
+bbcode_enabled = true
+text = "Your goal is to deliver as many crates as you can without running out of fuel in a limited space warehouse.
+Carry crates from the depot at the bottom of the screen to the delivery spot at the top of the screen. Match the color of the crates to the colors of the delivery spots.
+Once all the appropriate crates are placed in delivery, face the \"SEND\" button and interact with it. You can only order more crates after the existing crates have been moved into the warehouse. Every movement costs fuel, be sure to deliver the required crates and interact with the fuel button when your fuel gets low.
+
+[b]Controls						Keyboard				Controller[/b]
+Movement:					Arrow Keys			D-Pad
+Grab / Interact: 				Space					X / Square
+"
+tab_size = 5
+
+[node name="BackToMainMenu" type="Button" parent="CanvasLayer/Pause/HelpMenu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -108.0
+offset_top = -97.0
+offset_right = 108.0
+offset_bottom = -37.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Back"
+
 [connection signal="pressed" from="CanvasLayer/GameOverPanel/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/GameOverPanel/RetryButton" to="." method="_on_retry_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Pause/MainButtons/Continue" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="CanvasLayer/Pause/MainButtons/MainMenu" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Pause/MainButtons/Help" to="." method="_on_help_pressed"]
+[connection signal="pressed" from="CanvasLayer/Pause/MainButtons/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="CanvasLayer/Pause/HelpMenu/BackToMainMenu" to="." method="_on_back_to_main_menu_pressed"]

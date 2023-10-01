@@ -9,6 +9,8 @@ var refuelButton : Marker2D
 var numBlankCrates : int
 var player : Node2D
 
+var isPaused = false
+
 const GRID_SIZE = 100.0
 
 signal sendPressed
@@ -73,8 +75,9 @@ func convert_position(position: Vector2) -> Vector2:
 	return Vector2(round(position.x/GRID_SIZE),round(position.y/GRID_SIZE))
 
 func _process(delta):
-	if Input.is_physical_key_pressed(KEY_F5):
-		get_tree().quit()
+	if OS.has_feature("editor"):
+		if Input.is_physical_key_pressed(KEY_F5):
+			get_tree().quit()
 		
 func wiggle(t:float) -> float:
 	return sin(-13.0 * PI/2.0 * (t+1)) * pow(2, -10 * t) + 1

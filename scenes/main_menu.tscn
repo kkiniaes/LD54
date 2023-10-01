@@ -1,0 +1,162 @@
+[gd_scene load_steps=5 format=3 uid="uid://p5oo354h01d1"]
+
+[ext_resource type="Script" path="res://scenes/main_menu.gd" id="1_07u0j"]
+[ext_resource type="Texture2D" uid="uid://3ua5br7hi6cg" path="res://sprites/crate.png" id="2_4o7bw"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3eqs6"]
+emission_shape = 3
+emission_box_extents = Vector3(1000, 1, 1)
+particle_flag_disable_z = true
+direction = Vector3(0, 1, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 447.2
+initial_velocity_max = 844.72
+angular_velocity_min = -90.0
+angular_velocity_max = 90.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+angle_min = -90.0
+angle_max = 90.0
+scale_min = 0.25
+scale_max = 1.2
+hue_variation_min = -1.0
+hue_variation_max = 1.0
+
+[sub_resource type="Theme" id="Theme_djegf"]
+default_font_size = 29
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_07u0j")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+position = Vector2(945, -156)
+amount = 32
+process_material = SubResource("ParticleProcessMaterial_3eqs6")
+texture = ExtResource("2_4o7bw")
+lifetime = 3.0
+preprocess = 30.0
+speed_scale = 0.1
+interpolate = false
+visibility_rect = Rect2(-1000, 0, 2000, 1000)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.752941)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -60.0
+offset_top = 100.0
+offset_right = 60.0
+offset_bottom = 126.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 100
+text = "Crate Crammer"
+
+[node name="MainButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -358.0
+offset_top = -154.0
+offset_right = 358.0
+offset_bottom = 374.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Play" type="Button" parent="MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Play"
+
+[node name="Help" type="Button" parent="MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Help"
+
+[node name="Quit" type="Button" parent="MainButtons"]
+custom_minimum_size = Vector2(400, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 30
+text = "Quit"
+
+[node name="Space" type="Control" parent="MainButtons"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MainButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "All code and assets were created within the time limit of Ludum Dare 54 Compo 48hr solo competition. This is my first real Godot project, thanks for checking it out!"
+autowrap_mode = 2
+
+[node name="HelpMenu" type="RichTextLabel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -685.0
+offset_top = -288.0
+offset_right = 685.0
+offset_bottom = 402.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_djegf")
+bbcode_enabled = true
+text = "Your goal is to deliver as many crates as you can without running out of fuel in a limited space warehouse.
+Carry crates from the depot at the bottom of the screen to the delivery spot at the top of the screen. Match the color of the crates to the colors of the delivery spots.
+Once all the appropriate crates are placed in delivery, face the \"SEND\" button and interact with it. You can only order more crates after the existing crates have been moved into the warehouse. Every movement costs fuel, be sure to deliver the required crates and interact with the fuel button when your fuel gets low.
+
+[b]Controls						Keyboard				Controller[/b]
+Movement:					Arrow Keys			D-Pad
+Grab / Interact: 				Space					X / Square
+"
+tab_size = 5
+
+[node name="BackToMainMenu" type="Button" parent="HelpMenu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -108.0
+offset_top = -97.0
+offset_right = 108.0
+offset_bottom = -37.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Back"
+
+[connection signal="pressed" from="MainButtons/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="MainButtons/Help" to="." method="_on_help_pressed"]
+[connection signal="pressed" from="MainButtons/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="HelpMenu/BackToMainMenu" to="." method="_on_back_to_main_menu_pressed"]
